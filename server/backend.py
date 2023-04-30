@@ -52,8 +52,8 @@ class Backend_Api:
                 extra = [{'role': 'user', 'content': blob}]
 
             conversation = [{'role': 'system', 'content': system_message}] + \
-                extra + special_instructions[jailbreak] + \
-                _conversation + [prompt]
+                    extra + special_instructions[jailbreak] + \
+                    _conversation + [prompt]
 
             url = f"{self.openai_api_base}/v1/chat/completions"
 
@@ -65,17 +65,15 @@ class Backend_Api:
                 }
 
             gpt_resp = post(
-                url     = url,
-                proxies = proxies,
-                headers = {
-                    'Authorization': 'Bearer %s' % self.openai_key
-                }, 
-                json    = {
-                    'model'             : request.json['model'], 
-                    'messages'          : conversation,
-                    'stream'            : True
+                url=url,
+                proxies=proxies,
+                headers={'Authorization': f'Bearer {self.openai_key}'},
+                json={
+                    'model': request.json['model'],
+                    'messages': conversation,
+                    'stream': True,
                 },
-                stream  = True
+                stream=True,
             )
 
             def stream():
@@ -86,7 +84,7 @@ class Backend_Api:
 
                         if token != None: 
                             yield token
-                            
+
                     except GeneratorExit:
                         break
 
@@ -94,7 +92,7 @@ class Backend_Api:
                         print(e)
                         print(e.__traceback__.tb_next)
                         continue
-                        
+
             return self.app.response_class(stream(), mimetype='text/event-stream')
 
         except Exception as e:
